@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Marmot Catch</title>
+
+<style>
+body {
+    margin: 0;
+    background: #87CEEB;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+canvas {
+    background: #87CEEB;
+    image-rendering: pixelated;
+    width: 100vw;
+    height: 100vh;
+}
+</style>
+</head>
+<body>
+
+<canvas id="game"></canvas>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+canvas.width = 320;
+canvas.height = 180;
+
+// ===== GAME STATE =====
+let score = 0;
+let birds = [];
+let gravity = 0.5;
+let gameSpeed = 2;
+
+// ===== MARMOT =====
+const marmot = {
+    x: 40,
+    y: 130,
+    width: 16,
+    height: 16,
+    dy: 0,
+    grounded: true,
+    jumpPower: -8
+};
+
+// ===== INPUT (Mobile + Desktop) =====
+function jump() {
+    if (marmot.grounded) {
+        marmot.dy = marmot.jumpPower;
+        marmot.grounded = false;
+    }
+}
+
+document.addEventListener("touchstart", jump);
+document.addEventListener("mousedown", jump);
+
+// ===== SPAWN BIRDS =====
+function spawnBird() {
+    birds.push({
+        x: -20,
+        y: 40 + Math.random() * 80,
+        size: 12,
+        speed: 2 + Math.random() * 2
+    });
+}
+
+setInterval(spawnBird, 1200);
+
+// ===== UPDATE =====
+function update() {
+    // Gravity
+    marmot.dy += gravity;
+    marmot.y += marmot.dy;
+
+    // Ground
+    if (marmot.y >= 130) {
+        marmot.y = 130;
+        marmot.dy = 0;
+        marmot.grounded = true;
+    }
+
+    // Move birds
+    for (let i = birds.length - 1; i >= 0; i--) {
+        birds[i].x += birds[i].speed;
+
+        // Collision
+        if (
+            birds[i].x < marmot.x + marmot.width &&
+            birds[i].x + birds[i].size > marmot.x &&
+            birds[i].y < marmot.y + marmot.height &&
+            birds[i].y + birds[i].size > marmot.y
+        ) {
+            birds.splice(i, 1);
+            score++;
+            continue;
+        }
+
+        // Remove off-screen
+        if (birds[i].x > canvas.width) {
+            birds.splice(i, 1);
+        }
+    }
+}
+
+// ===== DRAW PIXEL MARMOT =====
+function drawMarmot(x, y) {
+    ctx.fillStyle = "#8B5A2B"; // body
+    ctx.fillRect(x+4, y+6, 8, 8);
+
+    ctx.fillStyle = "#A0522D"; // head
+    ctx.fillRect(x+6, y+2, 6, 6);
+
+    ctx.fillStyle = "#000"; // eye
+    ctx.fillRect(x+10, y+4, 1, 1);
+
+    ctx.fillStyle = "#654321"; // legs
+    ctx.fillRect(x+5, y+13, 2, 3);
+    ctx.fillRect(x+9, y+13, 2, 3);
+}
+
+// ===== DRAW PIXEL BIRD =====
+function drawBird(x, y) {
+    ctx.fillStyle = "black";
+    ctx.fillRect(x+2, y+4, 8, 4);
+    ctx.fillRect(x, y+5, 4, 2);   // wing
+    ctx.fillRect(x+8, y+5, 4, 2); // wing
+}
+
+// ===== DRAW =====
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Ground
+    ctx.fillStyle = "#228B22";
+    ctx.fillRect(0, 146, canvas.width, 34);
+
+    drawMarmot(marmot.x, marmot.y);
+
+    birds.forEach(bird => drawBird(bird.x, bird.y));
+
+    ctx.fillStyle = "black";
+    ctx.font = "12px monospace";
+    ctx.fillText("Score: " + score, 10, 15);
+}
+
+// ===== GAME LOOP =====
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+
+</body>
+</html>
