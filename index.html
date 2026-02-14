@@ -42,7 +42,6 @@ let gameSpeed = 2;
 
 // ===== MARMOT =====
 const marmot = {
-    x: 40,
     y: 130,
     width: 16,
     height: 16,
@@ -50,6 +49,7 @@ const marmot = {
     grounded: true,
     jumpPower: -8
 };
+marmot.x = canvas.width / 2 - marmot.width / 2;
 
 // ===== INPUT (Mobile + Desktop) =====
 function jump() {
