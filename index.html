@@ -67,7 +67,7 @@ function spawnBird() {
         x: -20,
         y: 70 + Math.random() * 50,
         size: 12,
-        speed: 2 + Math.random() * 2 * (performance.now() / 10000),
+        speed: 2 + Math.random() * 2 * (performance.now() / 20000),
         flap: 0,
         dflap: 0.5
     });
@@ -179,7 +179,7 @@ function draw() {
 
     ctx.fillStyle = "black";
     ctx.font = "10px monospace";
-    ctx.fillText("Score: " + score + "   Difficulty:" + Math.ceil(performance.now() / 10000), 10, 15);
+    ctx.fillText("Score: " + score + "   Difficulty:" + Math.ceil(performance.now() / 20000), 10, 15);
 }
 
 // ===== GAME LOOP =====
