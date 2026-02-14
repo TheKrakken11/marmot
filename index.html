@@ -65,15 +65,27 @@ document.addEventListener("mousedown", jump);
 function spawnBird() {
     birds.push({
         x: -20,
-        y: 40 + Math.random() * 80,
+        y: 70 + Math.random() * 50,
         size: 12,
-        speed: 2 + Math.random() * 2,
+        speed: 2 + Math.random() * 2 * (performance.now() / 10000),
         flap: 0,
         dflap: 0.5
     });
 }
+function randomInterval(callback, min, max) {
+    function loop() {
+        const delay = Math.random() * (max - min) + min;
+        setTimeout(() => {
+            callback();
+            loop();
+        }, delay);
+    }
+    loop();
+}
 
-setInterval(spawnBird, 1200);
+randomInterval(() => {
+    spawnBird();
+}, 700, 2000);
 
 // ===== UPDATE =====
 function update() {
@@ -166,8 +178,8 @@ function draw() {
     });
 
     ctx.fillStyle = "black";
-    ctx.font = "12px monospace";
-    ctx.fillText("Score: " + score, 10, 15);
+    ctx.font = "10px monospace";
+    ctx.fillText("Score: " + score + "   Difficulty:" + Math.ceil(performance.now() / 10000), 10, 15);
 }
 
 // ===== GAME LOOP =====
