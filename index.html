@@ -39,6 +39,7 @@ let score = 0;
 let birds = [];
 let gravity = 0.5;
 let gameSpeed = 2;
+let gameState = "home"; // "home", "playing"
 // ===== MARMOT =====
 const marmot = {
     y: 130,
@@ -52,11 +53,27 @@ marmot.x = canvas.width / 2 - marmot.width / 2;
 
 // ===== INPUT (Mobile + Desktop) =====
 function jump() {
+    if (gameState === "home") {
+        startGame();
+        return;
+    }
+
     if (marmot.grounded) {
         marmot.dy = marmot.jumpPower;
         marmot.grounded = false;
     }
 }
+
+function startGame() {
+    score = 0;
+    birds = [];
+    marmot.y = 130;
+    marmot.dy = 0;
+    marmot.grounded = true;
+
+    gameState = "playing";
+}
+
 
 document.addEventListener("touchstart", jump);
 document.addEventListener("mousedown", jump);
@@ -83,8 +100,24 @@ function randomInterval(callback, min, max) {
     loop();
 }
 
+function resetGame() {
+    score = 0;
+    birds = [];
+
+    marmot.y = 130;
+    marmot.dy = 0;
+    marmot.grounded = true;
+}
+
+function goHome() {
+    resetGame();
+    gameState = "home";
+}
+
 randomInterval(() => {
-    spawnBird();
+    if (gameState === "playing") {
+        spawnBird();
+    }
 }, 700, 2000);
 
 // ===== UPDATE =====
@@ -159,6 +192,19 @@ function drawBird(x, y, flap) {
 
 // ===== DRAW =====
 function draw() {
+    if (gameState === "home") {
+        ctx.fillStyle = "#87CEEB";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "black";
+        ctx.font = "14px monospace";
+        ctx.fillText("MARMOT CATCH", 25, 70);
+        
+        ctx.font = "10px monospace";
+        ctx.fillText("Tap or Click to Start", 30, 100);
+        
+        return; // stop drawing game
+    }
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Ground
@@ -184,12 +230,15 @@ function draw() {
 
 // ===== GAME LOOP =====
 function gameLoop() {
-    update();
+    if (gameState === "playing") {
+        update();
+    }
+
     draw();
     requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+requestAnimationFrame(gameLoop);
 </script>
 
 </body>
