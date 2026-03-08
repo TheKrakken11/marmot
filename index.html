@@ -53,6 +53,8 @@ canvas.height = 180;
 let score = 0;
 let birds = [];
 let gravity = 0.5;
+let hp = 20;
+let previous = performance.now();
 let gameSpeed = 2;
 let gameState = "home"; // "home", "playing"
 // ===== MARMOT =====
@@ -88,6 +90,7 @@ function startGame() {
     marmot.y = 130;
     marmot.dy = 0;
     marmot.grounded = true;
+    previous = performance.now();
 
     gameState = "playing";
 }
@@ -102,7 +105,7 @@ function spawnBird() {
         x: -20,
         y: 70 + Math.random() * 50,
         size: 12,
-        speed: 2 + Math.random() * 2 * (performance.now() / 20000),
+        speed: 2 + Math.random() * 2 * ((performance.now() - previous) / 20000),
         flap: 0,
         dflap: 0.5
     });
@@ -124,6 +127,7 @@ function resetGame() {
     marmot.y = 130;
     marmot.dy = 0;
     marmot.grounded = true;
+    hp = 20;
 }
 
 function goHome() {
@@ -168,9 +172,11 @@ function update() {
 
         // Remove off-screen
         if (birds[i].x > canvas.width) {
+            hp--;
             birds.splice(i, 1);
         }
     }
+    if (hp <= 0) goHome();
 }
 
 // ===== DRAW PIXEL MARMOT =====
@@ -244,7 +250,8 @@ function draw() {
 
     ctx.fillStyle = "black";
     ctx.font = "10px monospace";
-    ctx.fillText("Score: " + score + "   Difficulty:" + Math.ceil(performance.now() / 20000), 10, 15);
+    ctx.fillText("Score: " + score + "   Difficulty:" + Math.ceil((performance.now() - previous) / 20000), 10, 15);
+    ctx.fillText("Hp: " + hp, 10, 30);
 }
 
 // ===== GAME LOOP =====
